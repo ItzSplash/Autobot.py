@@ -7,23 +7,23 @@ class administration():
 
     @commands.command(pass_context=True , help= "deletes a large amount of messages",  aliases=["prune"])
     async def purge(self, ctx):
-        if ctx.message.author.permissions_in(ctx.message.channel).manage_messages == True:
-            split = ctx.message.content.split(" ") 
-            if len(split) == 1:
+        xtx = ctx.message.content.split(" ")
+        if ctx.message.author.permissions_in(ctx.message.channel).manage_messages == True: 
+            if len(xtx) == 1:
                 await self.bot.say("**Must Provide a Number**")
             else:
-                deletedmessage =  ctx.message.content.split(" ")[1]
-                await self.bot.purge_from(ctx.message.channel , limit = int(deletedmessage),  check=None)
+                await self.bot.purge_from(ctx.message.channel , limit = int(xtx[1]),  check=None)
+                v = await self.bot.say("deleted **{}** messages".format(xtx[1]))
+                await asyncio.sleep(3)
+                await self.bot.delete_message(v)
 
         else: await self.bot.say("You don't have the **manage messages** permission!")
     
     @commands.command(pass_context=True , help="kicks a certain user")
     async def kick(self , ctx):
-        split = ctx.message.content.split(" ")
-        
+        xtx = ctx.message.content.split(" ")
         if ctx.message.author.permissions_in(ctx.message.channel).kick_members == True:
-            split = ctx.message.content.split(" ")
-            if len(split) == 1:
+            if len(xtx) == 1:
                 await self.bot.say("**Must Provide a User**")
             else:
                 await self.bot.say("Are you sure you want to kick this person? Type `yes or no`.")
@@ -33,7 +33,7 @@ class administration():
                 if waitmsg.content.lower() is None:
                     await self.bot.say("user was not kicked")
                 if waitmsg.content.lower() == "yes":
-                    id = split[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
+                    id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
                     member = ctx.message.server.get_member(id)
                     if(member == None):
                         return await self.bot.say("User not found!")
@@ -48,8 +48,8 @@ class administration():
     @commands.command(pass_context=True, help= "bans a given user")
     async def ban(self , ctx):
         if ctx.message.author.permissions_in(ctx.message.channel).ban_members == True:
-            split = ctx.message.content.split(" ") 
-            if len(split) == 1:
+            xtx = ctx.message.content.split(" ") 
+            if len(xtx) == 1:
                 await self.bot.say("**Must Provide a User**")
             else:
                 await self.bot.say("Are you sure you wanna ban this person? Type `yes or no`.")
@@ -59,7 +59,7 @@ class administration():
                 if waitmsg.content.lower() is None:
                     await self.bot.say("user was not banned")
                 if waitmsg.content.lower() == "yes":
-                    id = split[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
+                    id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
                     member = ctx.message.server.get_member(id)
                     if(member == None):
                         return await self.bot.say("User not found!")
@@ -72,14 +72,42 @@ class administration():
             await self.bot.say("*You don't have enough permissions to ban someone!*")
 
     @commands.command(pass_context = True , help = "mutes user mentioned")
-    async def mute(self , ctx , member:discord.Member):
+    async def mute(self , ctx):
+        xtx = ctx.message.content.split(" ")
+        roles = ctx.message.server.roles
+        muted_role = discord.utils.get(roles, name = "Muted")
+        muted = "muted " + xtx[1]
+        muted2 = "muted " + xtx[1] + " for " + xtx[2] + " " + xtx[3]
+        id = ctx.message.content.split(" ")[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
+        member = ctx.message.server.get_member(id)
         if ctx.message.author.permissions_in(ctx.message.channel).manage_roles == True:
-            muted_role = discord.utils.get(ctx.message.server.roles, name = "Muted")
-            await self.bot.add_roles(member , muted_role)
-            await self.bot.say("muted " + member)
+            try:
+                if len(xtx) == 2:
+                    await self.bot.add_roles(member , muted_role)
+                    await self.bot.say("muted " + xtx[1])
+                if len(xtx) == 4:
+                    if xtx[3].lower() == "seconds":
+                        await self.bot.add_roles(member , muted_role)
+                        await self.bot.say(muted2)
+                        await asyncio.sleep(int(xtx[2]))
+                        await self.bot.remove_roles(member , muted_role)
+                    if xtx[3].lower() == "minutes":
+                        await self.bot.add_roles(member , muted_role)
+                        await self.bot.say(muted2)
+                        await asyncio.sleep(int(xtx[2]) * 60)
+                        await self.bot.remove_roles(member , muted_role)
+                    if xtx[3].lower() == "hours":
+                        await self.bot.add_roles(member , muted_role)
+                        await self.bot.say(muted2)
+                        await asyncio.sleep(int(xtx[2]) * 3600)
+                        await self.bot.remove_roles(member , muted_role)
+            except discord.FORBIDDEN:
+                await self.bot.say("*I dont have enough permissions!*")
         else: await self.bot.say("You must have the `manage_roles` permission")
     @commands.command(pass_context = True , help = "unmutes user mentioned")
     async def unmute(self , ctx , member:discord.Member):
+        if len(ctx.message.content.split(" "))==1:
+            await self.bot.say("Must provide a user")
         if ctx.message.author.permissions_in(ctx.message.channel).manage_roles == True:
             muted_role = discord.utils.get(ctx.message.server.roles, name = "Muted")
             await self.bot.remove_roles(member , muted_role)
@@ -87,27 +115,72 @@ class administration():
 
         else: await self.bot.say("You must have the `manage_roles` permission")
 
-    @commands.command(pass_context= True , help = "gives you a role")
-    async def iam(self, ctx):
-        role_name = ctx.message.content[5:].lower()
-        for role in ctx.message.server.roles:
-            if role.name.lower() == role_name:
-                await self.bot.add_roles(ctx.message.author , role)
-                await self.bot.send_message(ctx.message.channel , "added the **" + ctx.message.content[5:] + "** role!")
-
-    @commands.command(pass_context= True , help = "takes away a role")
-    async def imnot(self , ctx):
-        role_name = ctx.message.content[7:]
-        for role in ctx.message.server.roles:
-            if role.name.lower() == role_name:
-                    await self.bot.remove_roles(ctx.message.author , role)
-
-    @commands.command(pass_context= True)
-    @commands.has_permissions(manage_roles=True)
-    async def makerole(self , ctx, *, name):
-        '''Creates a role'''
-        await self.bot.create_role(ctx.message.server , name=name)
-
+    @commands.command(pass_context =True)
+    async def role(self, ctx):
+        xtx = ctx.message.content.split(" ")
+        author = ctx.message.author
+        se = ctx.message.server
+        tree = ctx.message.content[13:]
+        if len(xtx) == 1:
+            await self.bot.say("to use this command, you type ?role (add/remove/delete/create) (role name) such as `?role add Autobot`")
+        else:
+            if xtx[1] == "remove":
+                if len(xtx) == 2:
+                    await self.bot.say("must include a role to remove")
+                else:
+                    try:
+                        role_name = ctx.message.content[13:].lower() 
+                        for role in se.roles:
+                            if role.name.lower() == role_name:
+                                await self.bot.remove_roles(author , role)
+                                variable = await self.bot.say("{0}, you removed the **{1}** role".format(author.display_name, role_name ))
+                                await asyncio.sleep(5)
+                                await self.bot.delete_message(variable)
+                    except:
+                        variable = await self.bot.say("*I dont have enough permissions!*")
+                        await asyncio.sleep(6)
+                        await self.bot.delete_message(variable)
+            if xtx[1] == "add":
+                if len(xtx) == 2:
+                    await self.bot.say("must include a role to add")
+                else:
+                    try:
+                        role_name = ctx.message.content[10:].lower()
+                        for role in se.roles:
+                            if role.name.lower() == role_name: 
+                                await self.bot.add_roles(author , role)
+                                variable = await self.bot.say("{0}, you received the **{1}** role".format(author.display_name, role_name))
+                                await asyncio.sleep(5)
+                                await self.bot.delete_message(variable)
+                    except:
+                        variable = await self.bot.say("*I dont have enough permissions!*")
+                        await asyncio.sleep(6)
+                        await self.bot.delete_message(variable)
+            if xtx[1] == "create":
+                if len(xtx) == 2:
+                    await self.bot.say("must include a role to create")
+                else: 
+                    if author.permissions_in(ctx.message.channel).manage_roles == True:
+                        role_name = ctx.message.content[13:].lower() 
+                        for role in se.roles:
+                            if role.name.lower() == role_name:
+                                await self.bot.create_role(se , role_name)
+                                await self.bot.say("created the {} role!".format(role_name))
+                    else: return
+            if xtx[1] == "delete":
+                if len(xtx) == 2:
+                    await self.bot.say("must include a role to delete")
+                else: 
+                    if author.permissions_in(ctx.message.channel).manage_server == True:
+                        role_name = ctx.message.content[14:].lower() 
+                        for role in se.roles:
+                            if role.name.lower() == role_name:
+                                await self.bot.delete_role(se , role_name)
+                                await self.bot.say("created the {} role!".format(role_name))
+                    else: return
+            if xtx[1] == "list":
+                await self.bot.say("```{}```".format(', '.join(list(map(lambda x:x.name, ctx.message.server.roles)))))
+            
 
 
 def setup(bot):
