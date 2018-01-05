@@ -78,123 +78,126 @@ class monies():
     @commands.command(pass_context=True)
     async def spin(self , ctx):
         var = ctx.message.content.split(" ")
-        file = "/home/splash/levels.json"
+        file = "/home/splash/levels2.json"
+        b = "bank"
+        u = "user"
+        ids = ctx.message.author.id
+        colr = ctx.message.author.colour
         with open(file, 'r') as f:
             datastore = json.load(f)
-            qwerty = datastore["user"][ctx.message.author.id]["bank"]
-            if qwerty > int(var[1]):
+            qwerty = datastore[u][ids][b]
+            if qwerty >= int(var[1]):
                 if len(var)==2:
                     comp = random.randint(1,100)
+                    rolld = "you rolled a **{0}**, you win! You recieve **{1}** credits!"
+                    ch = ctx.message.channel
+                    
                     if comp == 100:
-                        variable1 = int(var[1]) * 3
-                        em = discord.Embed(description="you rolled a **{0}**, you win! You recieve **{1}** credits!".format(comp , variable1), colour=ctx.message.author.colour)
-                        await self.bot.send_message(ctx.message.channel, embed=em)
-                        open_file_object = open("/home/splash/levels.json", 'r')
-                        decoded_json = json.load(open_file_object)
-                        output_file = "/home/splash/levels.json"
-                        decoded_json["user"][ctx.message.author.id]["bank"] += int(variable1)
-                        with open(output_file, 'w') as write_file_object:
-                            write_file_object.write(json.dumps(decoded_json))
+                        var1 = int(var[1]) * 3
+                        em = discord.Embed(description=rolld.format(comp , var1), colour=colr)
+                        await self.bot.send_message(ch, embed=em)
+                        open1 = open(file, 'r')
+                        jsoon = json.load(open1)
+                        jsoon[u][ids][b] += int(var1)
+                        with open(file, 'w') as write1:
+                            write1.write(json.dumps(jsoon))
                     elif comp > 89:
-                        variable1 = (int(var[1]) * 2)
-                        em = discord.Embed(description="you rolled a **{0}**, you win! You recieve **{1}** credits!".format(comp , variable1), colour=ctx.message.author.colour)
-                        await self.bot.send_message(ctx.message.channel, embed=em)
-                        open_file_object = open("/home/splash/levels.json", 'r')
-                        decoded_json = json.load(open_file_object)
-                        output_file = "/home/splash/levels.json"
-                        decoded_json["user"][ctx.message.author.id]["bank"] += int(variable1)
-                        with open(output_file, 'w') as write_file_object:
-                            write_file_object.write(json.dumps(decoded_json))
+                        var1 = (int(var[1]) * 2)
+                        em = discord.Embed(description=rolld.format(comp , var1), colour=colr)
+                        await self.bot.send_message(ch, embed=em)
+                        open1 = open(file, 'r')
+                        jsoon = json.load(open1)
+                        jsoon[u][ids][b] += int(var1)
+                        with open(file, 'w') as write1:
+                            write1.write(json.dumps(jsoon))
                     elif comp > 74:
-                        variable1 = (int(var[1]) * 1.5)
-                        em = discord.Embed(description="you rolled a **{0}**, you win! You recieve **{1}** credits!".format(comp , variable1), colour=ctx.message.author.colour)
-                        await self.bot.send_message(ctx.message.channel, embed=em)
-                        open_file_object = open("/home/splash/levels.json", 'r')
-                        decoded_json = json.load(open_file_object)
-                        output_file = "/home/splash/levels.json"
-                        decoded_json["user"][ctx.message.author.id]["bank"] += int(variable1)
-                        with open(output_file, 'w') as write_file_object:
-                            write_file_object.write(json.dumps(decoded_json))
+                        var1 = (int(var[1]) * 1.5)
+                        em = discord.Embed(description=rolld.format(comp , var1), colour=colr)
+                        await self.bot.send_message(ch, embed=em)
+                        open1 = open(file, 'r')
+                        jsoon = json.load(open1)
+                        jsoon[u][ids][b] += int(var1)
+                        with open(file, 'w') as write1:
+                            write1.write(json.dumps(jsoon))
                     elif comp > 49:
-                        em = discord.Embed(description="you rolled a **{0}**, you win! You recieve **{1}** credits!".format(comp , var[1]), colour=ctx.message.author.colour)
-                        await self.bot.send_message(ctx.message.channel, embed=em)
-                        open_file_object = open("/home/splash/levels.json", 'r')
-                        decoded_json = json.load(open_file_object)
-                        output_file = "/home/splash/levels.json"
-                        decoded_json["user"][ctx.message.author.id]["bank"] += int(var[1])
-                        with open(output_file, 'w') as write_file_object:
-                            write_file_object.write(json.dumps(decoded_json))
+                        var1 = int(var[1])
+                        em = discord.Embed(description=rolld.format(comp , var1), colour=colr)
+                        await self.bot.send_message(ch, embed=em)
+                        open1 = open(file, 'r')
+                        jsoon = json.load(open1)
+                        jsoon[u][ids][b] += int(var[1])
+                        with open(file, 'w') as write1:
+                            write1.write(json.dumps(jsoon))
                     else:
-                        em = discord.Embed(description="you rolled a **{0}**, you lose. You lost **{1}** credits.".format(comp , var[1]), colour=ctx.message.author.colour)
-                        await self.bot.send_message(ctx.message.channel, embed=em)
-                        open_file_object = open("/home/splash/levels.json", 'r')
-                        decoded_json = json.load(open_file_object)
-                        output_file = "/home/splash/levels.json"
-                        decoded_json["user"][ctx.message.author.id]["bank"] -= int(var[1])
-                        with open(output_file, 'w') as write_file_object:
-                            write_file_object.write(json.dumps(decoded_json))
+                        var1 = int(var[1])
+                        em = discord.Embed(description=rolld.format(comp , var1), colour=colr)
+                        await self.bot.send_message(ch, embed=em)
+                        open1 = open(file, 'r')
+                        jsoon = json.load(open1)
+                        jsoon[u][ids][b] -= int(var[1])
+                        with open(file, 'w') as write1:
+                            write1.write(json.dumps(jsoon))
                 elif len(var)== 1:
-                    await self.bot.say("u need an amount to bet `?spin (amount)`")
+                    await self.bot.say("you need an amount to bet `=spin (amount)`")
             else: 
-                return
+                await self.bot.send_message(ch , "*You dont have enough credits!*")
             
     @commands.command(pass_context = True)
     async def flip(self , ctx):
         headtail = ["t" , "h"]
         computer = random.choice(headtail)
         var = ctx.message.content.split(" ")
+        ids = ctx.message.author.id
+        u = "user"
+        b = "bank"
         if len(var) == 3:
-            file = "/home/splash/levels.json"
+            file = "/home/splash/levels2.json"
             with open(file, 'r') as f:
                 datastore = json.load(f)
-                qwerty = datastore["user"][ctx.message.author.id]["bank"]
-                if qwerty > int(var[2]):
+                qwerty = datastore[u][ids][b]
+                if qwerty >= int(var[2]):
                     if var[1].lower() == "t":
                         if computer == var[1].lower():
-                            await self.bot.say("tails, you win")
-                            open_file_object = open("/home/splash/levels.json", 'r')
-                            decoded_json = json.load(open_file_object)
-                            output_file = "/home/splash/levels.json"
-                            decoded_json["user"][ctx.message.author.id]["bank"] += int(var[2])
-                            with open(output_file, 'w') as write_file_object:
-                                write_file_object.write(json.dumps(decoded_json))
+                            await self.bot.say("Tails, you win!")
+                            open1 = open(file, 'r')
+                            decoded_json = json.load(open1)
+                            decoded_json[u][ids][b] += int(var[2])
+                            with open(file, 'w') as write1:
+                                write1.write(json.dumps(decoded_json))
 
                         else: 
-                            await self.bot.say("heads, you lost")
-
-                            open_file_object = open("/home/splash/levels.json", 'r')
-                            decoded_json = json.load(open_file_object)
-                            output_file = "/home/splash/levels.json"
-                            decoded_json["user"][ctx.message.author.id]["bank"] -= int(var[2])
-                            with open(output_file, 'w') as write_file_object:
-                                write_file_object.write(json.dumps(decoded_json))
+                            await self.bot.say("Heads, you lost!")
+                            open1 = open(file, 'r')
+                            decoded_json = json.load(open1)
+                            decoded_json[u][ids][b] -= int(var[2])
+                            with open(file, 'w') as write1:
+                                write1.write(json.dumps(decoded_json))
 
                     if var[1].lower() == "h":
                         if computer == var[1].lower():
-                            await self.bot.say("heads, you win")
+                            await self.bot.say("Heads, you win!")
 
-                            open_file_object = open("/home/splash/levels.json", 'r')
-                            decoded_json = json.load(open_file_object)
-                            output_file = "/home/splash/levels.json"
-                            decoded_json["user"][ctx.message.author.id]["bank"] += int(var[2])
-                            with open(output_file, 'w') as write_file_object:
-                                write_file_object.write(json.dumps(decoded_json))
+                            open1 = open(file, 'r')
+                            decoded_json = json.load(open1)
+                            decoded_json[u][ids][b] += int(var[2])
+                            with open(file, 'w') as write1:
+                                write1.write(json.dumps(decoded_json))
 
                         else: 
-                            await self.bot.say("tails, you lost")
+                            await self.bot.say("Tails, you lost!")
 
-                            open_file_object = open("/home/splash/levels.json", 'r')
-                            decoded_json = json.load(open_file_object)
-                            output_file = "/home/splash/levels.json"
-                            decoded_json["user"][ctx.message.author.id]["bank"] -= int(var[2])
-                            with open(output_file, 'w') as write_file_object:
-                                write_file_object.write(json.dumps(decoded_json))
+                            open1 = open(file, 'r')
+                            decoded_json = json.load(open1)
+                            decoded_json[u][ids][b] -= int(var[2])
+                            with open(file, 'w') as write1:
+                                write1.write(json.dumps(decoded_json))
         if len(var) == 2:
             await self.bot.say("must include an amount to bet")
         if len(var) == 1:
-            await self.bot.say("?flip (h / t) (amount to bet)")
+            await self.bot.say("=flip (h / t) (amount to bet)")
         if var[2] == "tails" or var[2] == "heads":
             await self.bot.say("user must use `h / t` for it to work")
+
 
 
 
