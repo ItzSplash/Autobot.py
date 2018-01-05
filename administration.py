@@ -18,7 +18,17 @@ class administration():
                 await self.bot.delete_message(v)
 
         else: await self.bot.say("You don't have the **manage messages** permission!")
-    
+    @commands.command(pass_context = True)
+    async def voicekick(self , ctx):
+        id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
+        member = ctx.message.server.get_member(id)
+        if len(ctx.message.content.split(" ")) == 1:
+            await self.bot.say("*must include a user to move*")
+        else:
+            try:
+                await self.bot.move_member(member, ctx.message.server.afk_channel)
+            except:
+                await self.bot.say("must create an AFK channel")
     @commands.command(pass_context=True , help="kicks a certain user")
     async def kick(self , ctx):
         xtx = ctx.message.content.split(" ")
@@ -76,16 +86,16 @@ class administration():
         xtx = ctx.message.content.split(" ")
         roles = ctx.message.server.roles
         muted_role = discord.utils.get(roles, name = "Muted")
-        muted = "muted " + xtx[1]
-        muted2 = "muted " + xtx[1] + " for " + xtx[2] + " " + xtx[3]
         id = ctx.message.content.split(" ")[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
         member = ctx.message.server.get_member(id)
         if ctx.message.author.permissions_in(ctx.message.channel).manage_roles == True:
             try:
                 if len(xtx) == 2:
+                    muted = "muted " + xtx[1]
                     await self.bot.add_roles(member , muted_role)
-                    await self.bot.say("muted " + xtx[1])
+                    await self.bot.say(muted)
                 if len(xtx) == 4:
+                    muted2 = "muted " + xtx[1] + " for " + xtx[2] + " " + xtx[3]
                     if xtx[3].lower() == "seconds":
                         await self.bot.add_roles(member , muted_role)
                         await self.bot.say(muted2)
@@ -111,7 +121,7 @@ class administration():
         if ctx.message.author.permissions_in(ctx.message.channel).manage_roles == True:
             muted_role = discord.utils.get(ctx.message.server.roles, name = "Muted")
             await self.bot.remove_roles(member , muted_role)
-            await seld.bot.say("unmuted" + member)
+            await self.bot.say("unmuted {}".format(member))
 
         else: await self.bot.say("You must have the `manage_roles` permission")
 
@@ -179,8 +189,9 @@ class administration():
                                 await self.bot.say("created the {} role!".format(role_name))
                     else: return
             if xtx[1] == "list":
-                await self.bot.say("```{}```".format(', '.join(list(map(lambda x:x.name, ctx.message.server.roles)))))
-            
+                xtx = ctx.message
+                em = discord.Embed(title= "Server Roles", description="{}".format(', '.join(list(map(lambda x:x.name, ctx.message.server.roles)))), colour=ctx.message.author.colour)
+                await self.bot.send_message(xtx.channel, embed=em)
 
 
 def setup(bot):
