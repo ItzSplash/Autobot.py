@@ -18,7 +18,7 @@ Rem_photos = ['http://i.imgur.com/bl9iQsu.jpg' , 'http://i.imgur.com/Nsc5SlA.jpg
     'http://i.imgur.com/639OCxG.jpg', 'http://i.imgur.com/lz2IXrg.jpg', 'http://i.imgur.com/ZQ6tVyv.png',
     'http://i.imgur.com/WZjkDU8.jpg', 'http://i.imgur.com/4GIw1ne.jpg', 'http://i.imgur.com/IoeK3aM.jpg' ,
     'http://i.imgur.com/HDUeD1F.png', 'http://i.imgur.com/azszJ2B.png' ]
-EIGHT_BALL_OPTIONS = [" It is certain", "It is decidedly so", "Without a doubt",
+eight = [" It is certain", "It is decidedly so", "Without a doubt",
                         "Yes definitely", " You may rely on it", " As I see it yes",
                         " Most likely", " Outlook good", " Yes",
                         " Signs point to yes", " Reply hazy try again",
@@ -33,15 +33,19 @@ dictttt = {"A":"𝓐", "B":"𝓑", "C":"𝓒", "D":"𝓓", "E":"𝓔", "F":'𝓕
 'R':'𝓡', 'S':'𝓢', 'T':'𝓣', 'U':'𝓤','V':'𝓥', 'W':'𝓦', 'X':'𝓧', 'Y':'𝓨','Z':'𝒵',
 'a':'𝓪', 'b':'𝓫', 'c':'𝓬', 'd':'𝓭','e':'𝓮', 'f':'𝓯', 'g':'𝓰', 'h':'𝓱', 'i':'𝓲', 
 'j':'𝓳', 'k':'𝓴', 'l':'𝓵','m':'𝓶', 'n':'𝓷','o':'𝓸','p':'𝓹', 'q':'𝓺', 'r':'𝓻', 's':'𝓼',
-'t':'𝓽', 'u':'𝓾', 'v':'𝒱', 'w':'𝔀', 'x':'𝔁', 'y':'𝔂', 'z':'𝒵', " ":" ", "'":"'" , "\n":"\n"}
+'t':'𝓽', 'u':'𝓾', 'v':'𝒱', 'w':'𝔀', 'x':'𝔁', 'y':'𝔂', 'z':'𝒵', " ":" ", "'":"'" , "\n":"\n", ".":".", "?": "?"}
 class fun():
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(pass_context=True , help = "?say (text) bot says what u typed")
     async def say(self , ctx):
-        await self.bot.say(ctx.message.content[5:])
-        await self.bot.delete_message(ctx.message)
+        cont = ctx.message.content
+        if len(cont.split(" "))== 1:
+            await self.bot.say("must include text")
+        else:
+            await self.bot.say(ctx.message.content[5:])
+            await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context = True, aliases = ["calc"])
     async def calculator(self, ctx):
@@ -112,11 +116,11 @@ class fun():
         paper = 5
         rock = 7
         whoops =  [scissors , paper , rock]
-        xtx = ctx.message.content.split(" ")[1].lower()
         rps = random.choice(whoops)
         if len(ctx.message.content.split(" ")) == 1:
             await self.bot.say("you have to type it like `?rps (r/p/s)`")
-        else: 
+        else:
+            xtx = ctx.message.content.split(" ")[1].lower()
             if xtx == "rock" or xtx ==  "r":
                 if int(rps + rock) == 14:
                     await self.bot.say("**Rock!**, It's a Tie")
@@ -150,22 +154,28 @@ class fun():
     @commands.command(pass_context=True)
     async def randomcolor(self , ctx):
         randcolor = random.randint(0, 16777215)
-        em = discord.Embed(title= None, description=str(randcolor), colour=randcolor)
-        msg = await self.bot.send_message(ctx.message.channel ,  embed = em)
-        await self.bot.add_reaction(msg , ":track_next:")
+        emb = discord.Embed(title= None, description=str(randcolor), colour=randcolor)
+        msg = await self.bot.send_message(ctx.message.channel ,  embed = emb)
+        await self.bot.add_reaction(msg , "\U000023ed")
         @self.bot.event
-        async def on_message_react(reaction , user):
-            if reaction.emoji == ":track_next:":
+        async def on_reaction_add(reaction , user):
+            if reaction.emoji == "⏭":
+                randcolor = random.randint(0, 16777215)
+                em = discord.Embed(title= None, description=str(randcolor), colour=randcolor)
                 await self.bot.edit_message(msg, new_content=None, embed=em)
+                await self.bot.remove_reaction(msg, "\U000023ed", ctx.message.author)
 
     @commands.command(pass_context=True)
     async def fancy(self, ctx):
-        list1 = ctx.message.content[7:]
-        other_list = []
-        for i in list1:
-            other_list.append(dictttt[i])
-        await self.bot.say(''.join(other_list))
-        await self.bot.delete_message(ctx.message)
+        if len(ctx.message.content.split(" "))== 1:
+            await self.bot.send_message(ctx.message.channel, "must include args, such as `?fancy <text>`")
+        else:
+            list1 = ctx.message.content[7:]
+            other_list = []
+            for i in list1:
+                other_list.append(dictttt[i])
+            await self.bot.say(''.join(other_list))
+            await self.bot.delete_message(ctx.message)
 
 
     @commands.command(pass_context = True, hidden = True)
@@ -181,18 +191,25 @@ class fun():
             await self.bot.delete_message(ctx.message)
 
     
+    @commands.command(pass_context = True)
+    async def rule34(self, ctx):
+        if "nsfw" in ctx.message.channel.name:
+            await self.bot.say("kek, there is no nsfw command yet")
+        else: 
+            v = await self.bot.say("channel name must contain \"nsfw\" in it")
+            await asyncio.sleep(3)
+            await self.bot.delete_message(v)
 
 
-    @commands.command(pass_context=True, help= 'shows your prediction')
-    async def eightball(self , ctx):
-        return await self.bot.say('**' + ctx.message.author.name + '**' + " , your prediction :8ball:, **" + random.choice(EIGHT_BALL_OPTIONS) + '**')
+    @commands.command(pass_context=True, aliases = ["8ball"])
+    async def eii(self , ctx):
+        await self.bot.say("**{0}**, your prediction :8ball:, **{1}**".format(ctx.message.author.name,random.choice(eight)))
 
     @commands.command(pass_context=True, help= 'shows a random pick of Rem from Re:zero')
     async def rem(self):
-        return await self.bot.say(random.choice(Rem_photos))
+        await self.bot.say(random.choice(Rem_photos))
     @commands.command(pass_context=True, help= 'rolls a dice')
     async def rolldice(self , ctx):
-        rand_roll = ["1" , '2' , '3' , '4' , '5' , '6']
-        return await self.bot.say("**{0}** , your roll is **{1}**".format(ctx.message.author.name, random.choice(rand_roll)))
+        await self.bot.say("**{0}** , your roll is **{1}**".format(ctx.message.author.name, random.randint(1,6)))
 def setup(bot):
     bot.add_cog(fun(bot))
