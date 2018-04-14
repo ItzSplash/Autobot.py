@@ -7,42 +7,58 @@ class administration():
 
     @commands.command(pass_context=True , help= "deletes a large amount of messages",  aliases=["prune"])
     async def purge(self, ctx):
+        ch = ctx.message.channel
         xtx = ctx.message.content.split(" ")
-        if ctx.message.author.permissions_in(ctx.message.channel).manage_messages == True: 
+        if ctx.message.author.permissions_in(ch).manage_messages == True: 
             if len(xtx) == 1:
                 await self.bot.say("**Must Provide a Number**")
             else:
-                await self.bot.purge_from(ctx.message.channel , limit = int(xtx[1]),  check=None)
-                v = await self.bot.say("deleted **{}** messages".format(xtx[1]))
-                await asyncio.sleep(3)
-                await self.bot.delete_message(v)
+                
+                if len(xtx) == 2:
+                    await self.bot.purge_from(ch, limit = int(xtx[1]) + 1,  check=None)
+                    v = await self.bot.say("deleted **{}** messages".format(xtx[1]))
+                    await asyncio.sleep(3)
+                    await self.bot.delete_message(v)
+                elif xtx[2] == "bot":
+                    def is_me(m):
+                        return m.author.bot == True
+                    await self.bot.purge_from(ch , limit = int(xtx[1]) + 1,  check=is_me)
 
         else: await self.bot.say("You don't have the **manage messages** permission!")
     @commands.command(pass_context = True)
     async def voicekick(self , ctx):
-        id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
-        member = ctx.message.server.get_member(id)
-        if len(ctx.message.content.split(" ")) == 1:
+        serv = ctx.message.server
+        xtx =ctx.message.content.split(" ")
+        if len(xtx) == 1:
             await self.bot.say("*must include a user to move*")
         else:
-            try:
-                await self.bot.move_member(member, ctx.message.server.afk_channel)
-            except:
-                await self.bot.say("must create an AFK channel")
+            if ctx.message.author.voice is True:
+                if ctx.message.author.permissions_in(ctx.message.voice_channel).move_member == True: 
+                    id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
+                    member = serv.get_member(id)
+                    try:
+                        await self.bot.move_member(member, serv.afk_channel)
+                    except:
+                        await self.bot.say("must create an AFK channel")
+            else: await self.bot.say("you must be in a voice channel to kick someone")
     @commands.command(pass_context=True , help="kicks a certain user")
     async def kick(self , ctx):
+        ch = ctx.message.channel
+        auth = ctx.message.author
         xtx = ctx.message.content.split(" ")
-        if ctx.message.author.permissions_in(ctx.message.channel).kick_members == True:
+        kikk = "user was not kicked"
+        waitmg = waitmsg.content.lower()
+        if auth.permissions_in(ch).kick_members == True:
             if len(xtx) == 1:
                 await self.bot.say("**Must Provide a User**")
             else:
                 await self.bot.say("Are you sure you want to kick this person? Type `yes or no`.")
-                waitmsg = await self.bot.wait_for_message(15, channel=ctx.message.channel, author = ctx.message.author)
-                if waitmsg.content.lower() == "no":
-                    await self.bot.say("user was not kicked")
-                if waitmsg.content.lower() is None:
-                    await self.bot.say("user was not kicked")
-                if waitmsg.content.lower() == "yes":
+                waitmsg = await self.bot.wait_for_message(15, channel=ch, author = auth)
+                if waitmg == "no":
+                    await self.bot.say(kikk)
+                if waitmg is None:
+                    await self.bot.say(kikk)
+                if waitmg == "yes":
                     id = xtx[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "")
                     member = ctx.message.server.get_member(id)
                     if(member == None):
@@ -62,7 +78,7 @@ class administration():
             if len(xtx) == 1:
                 await self.bot.say("**Must Provide a User**")
             else:
-                await self.bot.say("Are you sure you wanna ban this person? Type `yes or no`.")
+                await self.bot.say("Are you sure you wanna ban this person? Type `yes` or `no`.")
                 waitmsg = await self.bot.wait_for_message(15, channel=ctx.message.channel, author = ctx.message.author)
                 if waitmsg.content.lower() == "no":
                     await self.bot.say("user was not banned")
@@ -80,6 +96,20 @@ class administration():
                         return await self.bot.say("*I don't have permissions!!*") 
         else:
             await self.bot.say("*You don't have enough permissions to ban someone!*")
+    @commands.command(pass_context=True)
+    async def unban(self, ctx):
+        xtx = ctx.message.content.split(" ")
+        if ctx.message.author.permissions_in(ctx.message.channel).manage_server == True:
+            if len(xtx) == 1:
+                await self.bot.say("**Must provide a user ID to unban**")
+            else: 
+                if(member == None):
+                        return await self.bot.say("User not found!")
+                try:
+                    await self.bot.unban(ctx.message.server , xtx[1])
+                    await self.bot.say("unbanned" + xtx[1])
+                except discord.Forbidden:
+                    return await self.bot.say("*I don't have permissions!!*") 
 
     @commands.command(pass_context = True , help = "mutes user mentioned")
     async def mute(self , ctx):
@@ -122,8 +152,21 @@ class administration():
             muted_role = discord.utils.get(ctx.message.server.roles, name = "Muted")
             await self.bot.remove_roles(member , muted_role)
             await self.bot.say("unmuted {}".format(member))
-
         else: await self.bot.say("You must have the `manage_roles` permission")
+    @commands.command(pass_context = True)
+    async def getuser(self, ctx):
+        xtx = ctx.message.content.split(" ")
+        ch = ctx.message.channel
+        if len(xtx) == 1:
+            await self.bot.send_message(ch, "must include a nickname or username to search")
+        else:
+            try:
+                await self.bot.send_message(ch, discord.utils.find(lambda m: m.display_name.lower() == xtx[1], ctx.message.channel.server.members).id)
+            except:
+                try:
+                    await self.bot.send_message(ch, discord.utils.find(lambda m: m.name.lower() == xtx[1], ctx.message.channel.server.members).id)
+                except:
+                    await self.bot.send_message(ch, "*User not found!*")
 
     @commands.command(pass_context =True)
     async def role(self, ctx):
