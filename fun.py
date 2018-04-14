@@ -33,47 +33,30 @@ dictttt = {"A":"𝓐", "B":"𝓑", "C":"𝓒", "D":"𝓓", "E":"𝓔", "F":'𝓕
 'R':'𝓡', 'S':'𝓢', 'T':'𝓣', 'U':'𝓤','V':'𝓥', 'W':'𝓦', 'X':'𝓧', 'Y':'𝓨','Z':'𝒵',
 'a':'𝓪', 'b':'𝓫', 'c':'𝓬', 'd':'𝓭','e':'𝓮', 'f':'𝓯', 'g':'𝓰', 'h':'𝓱', 'i':'𝓲', 
 'j':'𝓳', 'k':'𝓴', 'l':'𝓵','m':'𝓶', 'n':'𝓷','o':'𝓸','p':'𝓹', 'q':'𝓺', 'r':'𝓻', 's':'𝓼',
-'t':'𝓽', 'u':'𝓾', 'v':'𝒱', 'w':'𝔀', 'x':'𝔁', 'y':'𝔂', 'z':'𝒵', " ":" ", "'":"'" , "\n":"\n", ".":".", "?": "?"}
+'t':'𝓽', 'u':'𝓾', 'v':'𝒱', 'w':'𝔀', 'x':'𝔁', 'y':'𝔂', 'z':'𝒵', " ":" ", "'":"'" , "\n":"\n", "1":"1", "<":"<", ">":">", '2':'2', '3':'3', ".":".", "?":"?"}
 class fun():
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(pass_context=True , help = "?say (text) bot says what u typed")
     async def say(self , ctx):
-        cont = ctx.message.content
-        if len(cont.split(" "))== 1:
-            await self.bot.say("must include text")
+        if ctx.message.author.bot: 
+            return
         else:
-            await self.bot.say(ctx.message.content[5:])
-            await self.bot.delete_message(ctx.message)
+            cont = ctx.message.content
+            if len(cont.split(" "))== 1:
+                await self.bot.say("must include text")
+            else:
+                await self.bot.say(ctx.message.content[5:])
+                await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context = True, aliases = ["calc"])
-    async def calculator(self, ctx):
-        xtx = ctx.message.content.split(" ")
+    async def calculator(self, ctx, *maf:str):
         mess = ctx.message.channel
-        if len(xtx) == 1:
-            await self.bot.send_message(mess , "must provide integers")
-        elif len(xtx) == 2:
-            await self.bot.send_message(mess, int(xtx[1]))
-        else: 
-            l = int(xtx[1])
-            r = int(xtx[3])
-            if xtx[2] == "+":
-                await self.bot.send_message(mess , l + r)
-            elif xtx[2] == "-":
-                if right > left:
-                    await self.bot.say("**cannot do negative numbers**")
-                else: await self.bot.send_message(mess , l - r)
-            elif xtx[2] == "*":
-                await self.bot.send_message(mess , l * r)
-            elif xtx[2] == "/":
-                await self.bot.send_message(mess , l / r)
-            elif xtx[2] == "%":
-                await self.bot.send_message(mess , l % r)
-            elif len(xtx) == 1:
-                await self.bot.send_message(mess , "must provide integers")
-            elif len(xtx) == 2:
-                await self.bot.send_message(mess, int(xtx[1]))
+        try:
+            await self.bot.say(eval(''.join(maf)))
+        except Exception as e:
+            await self.bot.send_message(mess, e)
 
     @commands.command(pass_context=True)
     async def suicide(self , ctx):
@@ -165,17 +148,27 @@ class fun():
                 await self.bot.edit_message(msg, new_content=None, embed=em)
                 await self.bot.remove_reaction(msg, "\U000023ed", ctx.message.author)
 
+    @commands.command(pass_context = True)
+    async def choose(self, ctx):
+        xtx = ctx.message.content.split(" ")
+        if len(xtx) == 1:
+            return
+        else:
+            await self.bot.send_message(ctx.message.channel, "I choose... **" + random.choice(xtx[1:]) + "**!")
+    
     @commands.command(pass_context=True)
     async def fancy(self, ctx):
-        if len(ctx.message.content.split(" "))== 1:
-            await self.bot.send_message(ctx.message.channel, "must include args, such as `?fancy <text>`")
+        if ctx.message.author.bot: return
         else:
-            list1 = ctx.message.content[7:]
-            other_list = []
-            for i in list1:
-                other_list.append(dictttt[i])
-            await self.bot.say(''.join(other_list))
-            await self.bot.delete_message(ctx.message)
+            if len(ctx.message.content.split(" "))== 1:
+                await self.bot.send_message(ctx.message.channel, "must include args, such as `?fancy <text>`")
+            else:
+                list1 = ctx.message.content[7:]
+                other_list = []
+                for i in list1:
+                    other_list.append(dictttt[i])
+                await self.bot.say(''.join(other_list))
+                await self.bot.delete_message(ctx.message)
 
 
     @commands.command(pass_context = True, hidden = True)
@@ -190,7 +183,7 @@ class fun():
             await self.bot.say(''.join(other_list))
             await self.bot.delete_message(ctx.message)
 
-    
+    '''
     @commands.command(pass_context = True)
     async def rule34(self, ctx):
         if "nsfw" in ctx.message.channel.name:
@@ -199,7 +192,7 @@ class fun():
             v = await self.bot.say("channel name must contain \"nsfw\" in it")
             await asyncio.sleep(3)
             await self.bot.delete_message(v)
-
+'''
 
     @commands.command(pass_context=True, aliases = ["8ball"])
     async def eii(self , ctx):
