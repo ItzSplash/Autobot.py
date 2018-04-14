@@ -8,7 +8,7 @@ import asyncio
 import operator
 from discord.ext import commands
 
-startup_extensions = ["fun", "administration" , "information", "monies", "trivia"]
+startup_extensions = ["fun", "administration" , "information", "trivia", "api"]
 bot =commands.Bot(command_prefix ="?")
 
 
@@ -19,7 +19,6 @@ async def on_ready():
     bot.remove_command("help")
     await bot.change_presence(game=discord.Game(name="Type ?help", type=0))
 
-'''discord.on_server_join(server)'''
 
 @bot.command(pass_context=True , help= 'to test if the bot is online')
 async def ping(ctx):
@@ -30,28 +29,7 @@ async def ping(ctx):
     await bot.say("Pong! :ping_pong: {0}ms".format(ping))
 
 
-numbers = "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10" ,  'J' , "Q" , "K" , "A"
-suits = ":hearts:" , ":spades:", ":clubs:" , ":diamonds:"
-statistics = {":hearts:": 0, ":clubs:": 0, ":spade:": 0, ":diamond:": 0}
-#random.choice(numbers) + random.choice(suits)
 '''
-@bot.command(pass_context = True )
-async def poker(ctx):
-    cards2 = []
-    cards = []
-        cards.append(random.choice(numbers) + random.choice(suits))
-    while len(cards) != 5:
-    await bot.say("  |  ".join(cards))
-    for card in cards:
-        for suit in statistics.keys():
-            if card.find(suits) != -1:
-                statistics[suits] += 1
-    if statistics[":hearts:" , ":spades:", ":clubs:" , ":diamonds:"] > 4:
-        return await bot.say('You Won!')
-    else: return await bot.say('You Lost :(')
-
-
-
 @bot.command(pass_context=True, )
 async def summon(ctx):
     await bot.join_voice_channel(ctx.message.author.voice_channel)
@@ -64,7 +42,9 @@ async def summon(ctx):
 @bot.command(pass_context = True )
 async def dmmeboi(ctx):
     await bot.send_message(ctx.message.author , "hey uwu" )
-
+@bot.command()
+async def play():
+    return
 @bot.command(pass_context=True, hidden=True, help="Loads an extension")
 async def load(ctx, extension_name : str):
     ext = extension_name.lower()
@@ -87,20 +67,23 @@ async def unload(ctx, extension_name : str):
 @bot.command(pass_context = True, aliases = ["eval"], hidden = True)
 async def gggggggggg(ctx):
     return
-'''
+
 @bot.event
-async def on_member_join(member):
-    await bot.send_message(member.server.get_channel("386759227097743372"), member.display_name)
-'''
+async def on_server_join(server):
+    await bot.send_message(bot.get_channel("380129924708827137"), "Rikka joined the " + server.name +  " server")
+    try:
+        await bot.send_message(bot.get_channel(server.id), "Thank you for inviting me to your server! I have a ton of commands for you to use! if you want a new command added, or there is an error with the bot, please message the bot owner at `Itz Splash#0012`. To start, type `?help`")
+    except:
+        return
 @bot.event
 async def on_message(message):
     chan = message.channel
     con = message.content
     if con.startswith("<@387406522499727360>"):
         await bot.send_message(chan,"hey whats up")
-        waitmsg = await self.bot.wait_for_message(15, channel=ctx.message.channel, author = ctx.message.author)
-        if waitmsg == "nothing much" or waitmsg == "nm":
-            await bot.send_message(message.channel, ", i'm doing well also")
+        waitmsg = await bot.wait_for_message(15, channel=message.channel, author = message.author)
+        if waitmsg.content == "nothing much" or waitmsg.content == "nm":
+            await bot.send_message(message.channel, "thats good, i'm doing well also")
         
     elif con.lower().startswith("?eval") and message.author.id == "197063788560777216":
         try:
@@ -119,19 +102,17 @@ async def on_message(message):
         if message.author.bot: return
         else:
             em = discord.Embed(description=None, colour=message.author.colour)
-            em.add_field(name= "Administration:", value= "voicekick, role, purge, ban, kick, mute, unmute")
-            em.add_field(name= "Fun:", value= "fancy, calculator, roll, suicide, mal, rps, illegal, rem, rolldice, 8ball, say")
-            em.add_field(name= "Information:", value= "user, server, info, avatar, userid, remindme, serverinvite, nickname, invite")
-            em.add_field(name= "Gambling:", value= "credits, flip, spin")
-            em.set_footer(text="any errors with the bot, message Itz Splash#0012")
+            em.add_field(name= "Administration:", value= "voicekick, role, purge, ban, unban, kick, mute, unmute")
+            em.add_field(name= "Fun:", value= "choose, fancy, calculator, roll, suicide, mal, rps, illegal, rem, rolldice, 8ball, say")
+            em.add_field(name= "Information:", value= "discrim, user, server, info, avatar, userid, remindme, serverinvite, nickname, invite")
+            #em.add_field(name= "Gambling:", value= "credits, flip, spin")
+            em.add_field(name= "Games:", value="osu, rlrank, fortnite")
+            em.set_footer(text="any errors or suggestions, message Itz Splash#0012")
             await bot.send_message(message.channel, embed=em)
     await bot.process_commands(message)
     bot.remove_command("help")
 
-            
-
-
-
+  
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
