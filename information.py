@@ -10,16 +10,30 @@ class information():
         self.bot = bot
 	
 
-    @commands.command(pass_context=True , help = "?nickname (name), changes nickname, ?nickname to go back to normal")
+    @commands.command(pass_context=True)
     async def nickname(self , ctx):
-        try:
-            await self.bot.change_nickname(ctx.message.author , ctx.message.content[10:])
-            if len(ctx.message.content.split(" ")) == 1:
-                await self.bot.say("you reset your nickname")
-            else:
-                await self.bot.send_message(ctx.message.channel ,"You changed ur nickname to **" + ctx.message.content[10:] + "**")
-        except discord.FORBIDDEN:
-            await self.bot.say("permissions are too low...")
+        xtx = ctx.message.content.split(" ")
+        ch= ctx.message.channel
+        if len(xtx) == 1:
+            return await self.bot.send_message(ch, "proper use is `?nickname reset` or `?nickname new Rikka`")
+        else:
+            if xtx[1].lower() == "reset":
+                try:
+                    await self.bot.change_nickname(ctx.message.author , "")
+                    return await self.bot.say("you reset your nickname")
+                except discord.FORBIDDEN:
+                    return await self.bot.say("permissions are too low...")
+            elif xtx[1].lower() == "new":
+                try:
+                    if len(xtx) == 2:
+                        return await  self.bot.send_message(ch, "must include a new nicknname")
+                    else:
+                        await self.bot.change_nickname(ctx.message.author , xtx[2:])
+                        return await self.bot.send_message(ctx.message.channel ,"You changed ur nickname to **" + xtx[2:] + "**")
+                except discord.FORBIDDEN:
+                    return await self.bot.say("permissions are too low...")
+            else: 
+                return await self.bot.send_message(ch, "proper use is `?nickname reset` or `?nickname new Rikka`")
 
     @commands.command(pass_context = True , help = "shows your / someone elses avatar")
     async def avatar(self , ctx):
@@ -95,7 +109,7 @@ class information():
     @commands.command(pass_context=True, help="Shows information on the bot")
     async def info(self, ctx):
         me = ctx.message.server.me
-        embed = discord.Embed(colour=me.colour, title=self.bot.user.name + "#" + self.bot.user.discriminator, description="bot website: http://itzsplash.me")
+        embed = discord.Embed(colour=me.colour, title=self.bot.user.name + "#" + self.bot.user.discriminator)
         mike_icon = "https://cdn.discordapp.com/avatars/386586108776939520/7ab01f24369ee3f370ebd7cb0bc976be.webp"
         embed.set_author(name="Created by Itz Splash#0012", url="http://itzsplash.me/invite", icon_url=mike_icon)
         embed.add_field(name="Created at", value=me.created_at.strftime("%d %b %Y %H:%M:%S\n" + str((datetime.datetime.now() - me.created_at).days) + " days ago."))
@@ -139,7 +153,15 @@ class information():
             await self.bot.say(serverinvite)
         except discord.Forbidden:
             await self.bot.say("i dont have the `create instant invite` permission!")
-
+    @commands.command(pass_context =True)
+    async def discrim(self, ctx):
+        xtx = ctx.message.content.split(" ")
+        if len(xtx) == 1:
+            await self.bot.say("```The users with that discrim are:\n{}```".format(", ".join(list(set(list(map(lambda x: x.name, filter(lambda x: x.discriminator == ctx.message.author.discriminator, self.bot.get_all_members()))))))))
+        elif xtx[1] == "help":
+            await self.bot.say("this command is used for getting a new discriminator, such as the bot owners, `Itz Splash#0012`\n how to get a new discriminator:\n1: type `?discrim`\n2: pick a username from the list and change your username\n3: after 24 hours you can change your discrim again")
+        else:
+            await self.bot.say("```py\nThe users with that discrim are:\n{}```".format(", ".join(list(set(list(map(lambda x: x.name, filter(lambda x: x.discriminator ==xtx[1], self.bot.get_all_members()))))))))
     @commands.command(pass_context=True)
     async def remindme(self, ctx):
         xtx = ctx.message.content.split(" ")
